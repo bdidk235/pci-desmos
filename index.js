@@ -1,7 +1,7 @@
 async function loadJson(path) {
 	const res = await fetch(path);
 	if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-	return res.text(); // returns parsed object (Promise resolves to JSON)
+	return res.text();
 }
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
@@ -9,7 +9,7 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 async function main() {
 	try {
 		// Get State JSON
-		const stateText = await loadJson("/state.json");
+		const stateText = await loadJson("./state.json");
 		const initialState = JSON.parse(stateText.replaceAll("\\\\", "\\"));
 
 		// Put state into "calculator"
