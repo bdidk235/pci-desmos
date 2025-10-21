@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html style="background: black; height: 100%;">
+	<head>
+		<script src="https://www.desmos.com/api/v1.11.2/calculator.js?apiKey=f125785048234270af22d44320ae5218"></script>
+		<style>
+			.dcg-container.dcg-default-border {
+				border: none !important;
+			}
+		</style>
+	</head>
+	<body style="height: 100%; margin: 0;">
+		<span style="position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font: 600 1.25rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;">Loading...</span>
+
+		<div id="calculator" style="position: absolute; visibility: hidden; width: 100%; height: 100%;"></div>
+		<div style="position: absolute; bottom: 8px; right: 8px;">
+			<button id="import-data">Import Data</button>
+			<button id="export-data">Export Data</button>
+			<button id="save-data">Save Data</button>
+		</div>
+
+		<script src="/index.js"></script>
+	</body>
+</html>
