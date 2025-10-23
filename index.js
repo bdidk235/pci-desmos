@@ -22,6 +22,9 @@ async function main() {
 				} else {
 					galaxyData = { data: null, message: e.data.message };
 				}
+			} else if (e.data.type === "saved") {
+				if (e.data.error === true)
+					alert("Failed to save to cloud.")
 			}
 		}
 	});
@@ -57,13 +60,7 @@ async function main() {
 
 	async function loadFromStorage() {
 		const storedData = localStorage.getItem("data");
-		if (storedData) {
-			if (!validateData(storedData)) {
-				alert("Your save is invalid, your game will be reset.")
-				return;
-			}
-			setDataToExpression(storedData);
-		} else if (onGalaxy) {
+		if (onGalaxy) {
 			window.top.postMessage({
 				action: "load",
 				slot: 0,
@@ -78,19 +75,46 @@ async function main() {
 			}));
 
 			if (data) {
-				if (data.message !== "no_account" && data.message !== "empty_slot") {
-					if (confirm("Failed to get data from galaxy: " + data.message + ", do you want to try again?"))
+				if (data.message === "server_error") {
+					if (confirm("Failed to get data from galaxy due to a server error, do you want to try again?")) {
 						loadFromStorage();
+						return;
+					}
+					if (storedData)
+						setDataToExpression(storedData);
+					return;
+				} else if (data.message) {
+					if (storedData)
+						setDataToExpression(storedData);
 					return;
 				}
-				if (!validateData(storedData)) {
-					alert("Your save is invalid, your game will be reset.");
+				if (!validateData(data.content)) {
+					if (storedData && validateData(storedData)) {
+						if (!confirm("Your cloud save is invalid, do you want to use your local save instead?"))
+							setDataToExpression(storedData);
+					} else {
+						alert("Your local and cloud saves is invalid, your game will be reset.");
+					}
 					return;
+				}
+				if (storedData && storedData !== data.content && validateData(storedData)) {
+					if (!confirm("Your local save does not match cloud save, do you want to load from cloud?")) {
+						setDataToExpression(storedData);
+						return;
+					}
 				}
 				setDataToExpression(data.content);
 			} else {
-				if (confirm("Failed to get data from galaxy, do you want to try again?"))
+				if (confirm("Timed out while getting data from galaxy, do you want to try again?"))
 					loadFromStorage();
+			}
+		} else {
+			if (storedData) {
+				if (!validateData(storedData)) {
+					alert("Your save is invalid, your game will be reset.")
+					return;
+				}
+				setDataToExpression(storedData);
 			}
 		}
 	}
