@@ -9,13 +9,12 @@
 		</style>
 	</head>
 	<body style="height: 100%; margin: 0;">
-		<span style="position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font: 600 1.25rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;">Loading...</span>
+		<span id="loading" style="position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font: 600 1.25rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;">Loading...</span>
 
 		<div id="calculator" style="position: absolute; visibility: hidden; width: 100%; height: 100%;"></div>
 		<div style="position: absolute; bottom: 8px; right: 8px;">
-			<button id="import-data">Import Data</button>
-			<button id="export-data">Export Data</button>
-			<button id="save-data">Save Data</button>
+			<button id="data-button">Import/Export Save</button>
+			<button id="save-data">Save</button>
 		</div>
 
 		<script src="./index.js"></script>

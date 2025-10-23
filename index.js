@@ -7,100 +7,170 @@ async function loadJson(path) {
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 async function main() {
-	try {
-		// Get State JSON
-		const stateText = await loadJson("./state.json");
-		const initialState = JSON.parse(stateText.replaceAll("\\\\", "\\"));
+	const loadingElement = document.querySelector("#loading");
 
-		// Put state into "calculator"
-		const element = document.querySelector("#calculator");
-		const calculator = Desmos.GraphingCalculator(element, { lockViewport: true, expressionsCollapsed: true, settingsMenu: false, zoomButtons: false, actions: true });
-		window.Calc = calculator;
-		calculator.setState(initialState, { remapColors: true });
-
-		// Auto-run
-		calculator.setExpression({ id: "544", latex: 'r_{unning}=1' });
-
-		// Handle Data
-		function getDataFromExpression() {
-			const expression = calculator.getExpressions().find(e => e.id === '583');
-			return expression.latex.replace(/^d_{ata}=\\left\[(.*)\\right\]$/, '$1');
-		}
-
-		async function setDataToExpression(data) {
-			calculator.setExpression({ id: "583", latex: 'd_{ata}=\\left[' + data + '\\right]' });
-		}
-
-		async function loadFromStorage() {
-			const storedData = localStorage.getItem("data");
-			if (storedData) {
-				setDataToExpression(storedData);
+	// Listen to galaxy.click
+	let onGalaxy = window.top.origin == "https://galaxy.click";
+	let galaxyData = null;
+	window.addEventListener("message", e => {
+		console.log(e);
+		if (e.origin === "https://galaxy.click") {
+			onGalaxy = true;
+			if (e.data.type === "save_content") {
+				if (e.data.error === false) {
+					galaxyData = { data: e.data.content };
+				} else {
+					galaxyData = { data: null, message: e.data.message };
+				}
 			}
 		}
+	});
 
-		async function saveToStorage() {
-			const expressionData = getDataFromExpression();
-			localStorage.setItem("data", expressionData);
+	// Get State JSON
+	const stateText = await loadJson("./state.json");
+	const initialState = JSON.parse(stateText.replaceAll("\\\\", "\\"));
+
+	// Put state into "calculator"
+	const element = document.querySelector("#calculator");
+	const calculator = Desmos.GraphingCalculator(element, { lockViewport: true, expressionsCollapsed: true, settingsMenu: false, zoomButtons: false, actions: true });
+	window.Calc = calculator;
+	calculator.setState(initialState, { remapColors: true });
+
+	// Handle Data
+	function validateData(data) {
+		const values = data.split(",");
+		for (i in values) {
+			const number = new Number(values[i]).valueOf()
+			if (number !== number) return false
 		}
+		return true
+	}
 
-		async function saveToExpression() {
-			const expression = calculator.getExpressions().find(e => e.id === '585');
-			const values = expression.latex.replace(/^f_{save}\\left\(\\right\)=d_{ata}\\to\\left\[(.*)\\right]$/, '$1').split(",");
-			let expressions = [];
-			values.forEach((v) => {
-				const vExpression = calculator.getExpressions().find(e => e.latex != undefined && e.latex.startsWith(v));
-				if (vExpression) {
-					expressions.push(vExpression.latex.replaceAll(v + "=", ""));
+	function getDataFromExpression() {
+		const expression = calculator.getExpressions().find(e => e.id === '583');
+		return expression.latex.replace(/^d_{ata}=\\left\[(.*)\\right\]$/, '$1');
+	}
+
+	async function setDataToExpression(data) {
+		calculator.setExpression({ id: "583", latex: 'd_{ata}=\\left[' + data + '\\right]' });
+	}
+
+	async function loadFromStorage() {
+		const storedData = localStorage.getItem("data");
+		if (storedData) {
+			if (!validateData(storedData)) {
+				alert("Your save is invalid, your game will be reset.")
+				return;
+			}
+			setDataToExpression(storedData);
+		} else if (onGalaxy) {
+			window.top.postMessage({
+				action: "load",
+				slot: 0,
+			}, "https://galaxy.click");
+
+			const data = await (new Promise(resolve => {
+				setTimeout(() => {
+					resolve(null);
+				}, 1000);
+				while (!galaxyData);
+				resolve(galaxyData);
+			}));
+
+			if (data) {
+				if (data.message !== "no_account" && data.message !== "empty_slot") {
+					if (confirm("Failed to get data from galaxy: " + data.message + ", do you want to try again?"))
+						loadFromStorage();
+					return;
 				}
-			})
-			setDataToExpression(expressions);
-		}
-
-		async function loadFromExpression() {
-			const expression = calculator.getExpressions().find(e => e.id === '585');
-			const valuesOrder = expression.latex.replace(/^f_{save}\\left\(\\right\)=d_{ata}\\to\\left\[(.*)\\right]$/, '$1').split(",");
-			const values = getDataFromExpression().split(",");
-			valuesOrder.forEach((v, i) => {
-				const vExpression = calculator.getExpressions().find(e => e.latex != undefined && e.latex.startsWith(v));
-				if (vExpression && values[i]) {
-					calculator.setExpression({ id: vExpression.id, latex: v + '=' + values[i] });
+				if (!validateData(storedData)) {
+					alert("Your save is invalid, your game will be reset.");
+					return;
 				}
-			})
+				setDataToExpression(data.content);
+			} else {
+				if (confirm("Failed to get data from galaxy, do you want to try again?"))
+					loadFromStorage();
+			}
 		}
+	}
 
-		loadFromStorage();
-		loadFromExpression();
-		window.addEventListener('beforeunload', () => {
-			saveToExpression();
-			saveToStorage();
+	async function saveToStorage() {
+		const expressionData = getDataFromExpression();
+		localStorage.setItem("data", expressionData);
+		window.top.postMessage({
+			action: "save",
+			slot: 0,
+			label: "Cloud Save",
+			data: expressionData,
+		}, "https://galaxy.click")
+	}
+
+	async function saveToExpression() {
+		const expression = calculator.getExpressions().find(e => e.id === '585');
+		const values = expression.latex.replace(/^f_{save}\\left\(\\right\)=d_{ata}\\to\\left\[(.*)\\right]$/, '$1').split(",");
+		let expressions = [];
+		values.forEach((v) => {
+			const vExpression = calculator.getExpressions().find(e => e.latex !== undefined && e.latex.startsWith(v));
+			if (vExpression) {
+				expressions.push(vExpression.latex.replaceAll(v + "=", ""));
+			}
+		})
+		setDataToExpression(expressions);
+	}
+
+	async function loadFromExpression() {
+		const expression = calculator.getExpressions().find(e => e.id === '585');
+		const valuesOrder = expression.latex.replace(/^f_{save}\\left\(\\right\)=d_{ata}\\to\\left\[(.*)\\right]$/, '$1').split(",");
+		const values = getDataFromExpression().split(",");
+		valuesOrder.forEach((v, i) => {
+			const vExpression = calculator.getExpressions().find(e => e.latex !== undefined && e.latex.startsWith(v));
+			if (vExpression && values[i]) {
+				calculator.setExpression({ id: vExpression.id, latex: v + '=' + values[i] });
+			}
 		});
+	}
 
-		// Data Buttons
-		const importDataButton = document.querySelector("#import-data");
-		const exportDataButton = document.querySelector("#export-data");
-		const saveDataButton = document.querySelector("#save-data");
+	// Loading Data
+	loadingElement.innerHTML = "Loading Data..."
 
-		importDataButton.addEventListener("click", function() {
-			const newData = prompt("Import data", getDataFromExpression());
-			if (newData) {
+	loadFromStorage();
+	loadFromExpression();
+	window.addEventListener('beforeunload', () => {
+		saveToExpression();
+		saveToStorage();
+	});
+
+	// Auto-run
+	calculator.setExpression({ id: "544", latex: 'r_{unning}=1' });
+
+	// Data Buttons
+	const dataButton = document.querySelector("#data-button");
+	const saveDataButton = document.querySelector("#save-data");
+
+	dataButton.addEventListener("click", function() {
+		saveToExpression();
+		const newData = prompt("Import Save (Copy to Export)", getDataFromExpression());
+		if (newData) {
+			if (validateData(newData)) {
 				setDataToExpression(newData);
 				loadFromExpression();
+			} else {
+				alert("Invalid save data.")
 			}
-		});
-		exportDataButton.addEventListener("click", function() {
-			prompt("Exported Data", getDataFromExpression());
-		});
-		saveDataButton.addEventListener("click", function() {
-			saveToExpression();
-			saveToStorage();
-		});
+		}
+	});
+	saveDataButton.addEventListener("click", function() {
+		saveToExpression();
+		saveToStorage();
+	});
 
-		// Loaded
-		await sleep(1000); // Making sure calculator has loaded
-		element.style.visibility = "";
-	} catch (e) {
-		console.error(e);
-	}
+	// Loading Game
+	loadingElement.innerHTML = "Loading Game..."
+
+	// Loaded
+	await sleep(1000); // Making sure calculator has loaded
+	element.style.visibility = "";
 }
 
 main();
