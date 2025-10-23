@@ -80,12 +80,22 @@ async function main() {
 						loadFromStorage();
 						return;
 					}
-					if (storedData)
+					if (storedData) {
+						if (!validateData(storedData)) {
+							alert("Your save is invalid, your game will be reset.")
+							return;
+						}
 						setDataToExpression(storedData);
+					}
 					return;
 				} else if (data.message) {
-					if (storedData)
+					if (storedData) {
+						if (!validateData(storedData)) {
+							alert("Your save is invalid, your game will be reset.")
+							return;
+						}
 						setDataToExpression(storedData);
+					}
 					return;
 				}
 				if (!validateData(data.content)) {
@@ -105,8 +115,17 @@ async function main() {
 				}
 				setDataToExpression(data.content);
 			} else {
-				if (confirm("Timed out while getting data from galaxy, do you want to try again?"))
+				if (confirm("Timed out while getting data from galaxy, do you want to try again?")) {
 					loadFromStorage();
+					return;
+				}
+				if (storedData) {
+					if (!validateData(storedData)) {
+						alert("Your save is invalid, your game will be reset.")
+						return;
+					}
+					setDataToExpression(storedData);
+				}
 			}
 		} else {
 			if (storedData) {
