@@ -11,16 +11,16 @@ async function main() {
 
 	// Listen to galaxy.click
 	let onGalaxy = document.referrer.startsWith("https://galaxy.click");
-	let galaxyData = null;
+	let sendGalaxyData = null;
 	window.addEventListener("message", e => {
 		console.log(e);
 		if (e.origin === "https://galaxy.click") {
 			onGalaxy = true;
-			if (e.data.type === "save_content") {
+			if (e.data.type === "save_content" && sendGalaxyData) {
 				if (e.data.error === false) {
-					galaxyData = { data: e.data.content };
+					sendGalaxyData({ data: e.data.content });
 				} else {
-					galaxyData = { data: null, message: e.data.message };
+					sendGalaxyData({ data: null, message: e.data.message });
 				}
 			} else if (e.data.type === "saved") {
 				if (e.data.error === true)
@@ -70,9 +70,9 @@ async function main() {
 				setTimeout(() => {
 					resolve(null);
 				}, 1000);
-				while (!galaxyData);
-				resolve(galaxyData);
+				sendGalaxyData = resolve;
 			}));
+			sendGalaxyData = null;
 
 			if (data) {
 				if (data.message === "server_error") {
