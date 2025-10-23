@@ -10,7 +10,7 @@ async function main() {
 	const loadingElement = document.querySelector("#loading");
 
 	// Listen to galaxy.click
-	let onGalaxy = window.top.origin == "https://galaxy.click";
+	let onGalaxy = document.referrer.startsWith("https://galaxy.click");
 	let galaxyData = null;
 	window.addEventListener("message", e => {
 		console.log(e);
