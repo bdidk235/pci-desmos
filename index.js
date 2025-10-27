@@ -196,7 +196,7 @@ async function main() {
 		const newData = prompt("Import Save (Copy to Export)", getDataFromExpression());
 		if (newData) {
 			if (validateData(newData)) {
-				await setDataToExpression(newData);
+				setDataToExpression(newData);
 				await loadFromExpression();
 			} else {
 				alert("Invalid save data.")
