@@ -55,7 +55,13 @@ async function main() {
 	}
 
 	async function setDataToExpression(data) {
-		calculator.setExpression({ id: "583", latex: 'd_{ata}=\\left[' + data + '\\right]' });
+		const latex = 'd_{ata}=\\left[' + data + '\\right]';
+
+		const expression = calculator.getExpressions().find(e => e.id === '583');
+		while (expression.latex !== latex) {
+			calculator.setExpression({ id: "583", latex: latex });
+			await sleep(100);
+		}
 	}
 
 	async function loadFromStorage() {
@@ -176,8 +182,6 @@ async function main() {
 
 	// Loading Data
 	loadingElement.innerHTML = "Loading Data..."
-
-	await sleep(500);
 
 	loadFromStorage();
 	loadFromExpression();
