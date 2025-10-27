@@ -177,6 +177,8 @@ async function main() {
 	// Loading Data
 	loadingElement.innerHTML = "Loading Data..."
 
+	await sleep(500);
+
 	loadFromStorage();
 	loadFromExpression();
 	window.addEventListener('beforeunload', () => {
@@ -214,7 +216,7 @@ async function main() {
 	calculator.setExpression({ id: "544", latex: 'r_{unning}=1' });
 
 	// Loaded
-	await sleep(500); // Making sure calculator has loaded
+	await sleep(1000); // Making sure calculator has loaded
 	element.style.visibility = "";
 }
 
