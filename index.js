@@ -184,8 +184,6 @@ async function main() {
 		saveToStorage();
 	});
 
-	// Auto-run
-	calculator.setExpression({ id: "544", latex: 'r_{unning}=1' });
 
 	// Data Buttons
 	const dataButton = document.querySelector("#data-button");
@@ -211,8 +209,12 @@ async function main() {
 	// Loading Game
 	loadingElement.innerHTML = "Loading Game..."
 
+	// Auto-run
+	await sleep(500);
+	calculator.setExpression({ id: "544", latex: 'r_{unning}=1' });
+
 	// Loaded
-	await sleep(1000); // Making sure calculator has loaded
+	await sleep(500); // Making sure calculator has loaded
 	element.style.visibility = "";
 }
 
