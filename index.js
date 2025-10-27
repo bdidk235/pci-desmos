@@ -183,7 +183,7 @@ async function main() {
 	await loadFromExpression();
 	window.addEventListener('beforeunload', () => {
 		saveToExpression();
-		await saveToStorage();
+		saveToStorage();
 	});
 
 
@@ -205,7 +205,7 @@ async function main() {
 	});
 	saveDataButton.addEventListener("click", function() {
 		saveToExpression();
-		await saveToStorage();
+		saveToStorage();
 	});
 
 	// Loading Game
