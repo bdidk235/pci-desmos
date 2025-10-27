@@ -178,12 +178,12 @@ async function main() {
 	// Loading Data
 	loadingElement.innerHTML = "Loading Data..."
 
-	loadFromStorage();
+	await loadFromStorage();
 	await sleep(100);
-	loadFromExpression();
+	await loadFromExpression();
 	window.addEventListener('beforeunload', () => {
-		saveToExpression();
-		saveToStorage();
+		await saveToExpression();
+		await saveToStorage();
 	});
 
 
@@ -192,20 +192,20 @@ async function main() {
 	const saveDataButton = document.querySelector("#save-data");
 
 	dataButton.addEventListener("click", function() {
-		saveToExpression();
+		await saveToExpression();
 		const newData = prompt("Import Save (Copy to Export)", getDataFromExpression());
 		if (newData) {
 			if (validateData(newData)) {
-				setDataToExpression(newData);
-				loadFromExpression();
+				await setDataToExpression(newData);
+				await loadFromExpression();
 			} else {
 				alert("Invalid save data.")
 			}
 		}
 	});
 	saveDataButton.addEventListener("click", function() {
-		saveToExpression();
-		saveToStorage();
+		await saveToExpression();
+		await saveToStorage();
 	});
 
 	// Loading Game
