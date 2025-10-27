@@ -192,12 +192,11 @@ async function main() {
 	const saveDataButton = document.querySelector("#save-data");
 
 	dataButton.addEventListener("click", function() {
-		await ();
 		const newData = prompt("Import Save (Copy to Export)", getDataFromExpression());
 		if (newData) {
 			if (validateData(newData)) {
 				setDataToExpression(newData);
-				await loadFromExpression();
+				loadFromExpression();
 			} else {
 				alert("Invalid save data.")
 			}
