@@ -81,7 +81,7 @@ async function main() {
 			}));
 			sendGalaxyData = null;
 
-			if (data) {
+			if (data && data.content) {
 				if (data.message === "server_error") {
 					if (confirm("Failed to get data from galaxy due to a server error, do you want to try again?")) {
 						loadFromStorage();
