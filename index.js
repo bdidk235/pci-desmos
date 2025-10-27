@@ -182,7 +182,7 @@ async function main() {
 	await sleep(100);
 	await loadFromExpression();
 	window.addEventListener('beforeunload', () => {
-		await saveToExpression();
+		saveToExpression();
 		await saveToStorage();
 	});
 
@@ -192,7 +192,7 @@ async function main() {
 	const saveDataButton = document.querySelector("#save-data");
 
 	dataButton.addEventListener("click", function() {
-		await saveToExpression();
+		await ();
 		const newData = prompt("Import Save (Copy to Export)", getDataFromExpression());
 		if (newData) {
 			if (validateData(newData)) {
@@ -204,7 +204,7 @@ async function main() {
 		}
 	});
 	saveDataButton.addEventListener("click", function() {
-		await saveToExpression();
+		saveToExpression();
 		await saveToStorage();
 	});
 
