@@ -56,13 +56,7 @@ async function main() {
 	}
 
 	async function setDataToExpression(data) {
-		const latex = 'd_{ata}=\\left[' + data + '\\right]';
-
-		const expression = calculator.getExpressions().find(e => e.id === '583');
-		while (expression.latex !== latex) {
-			calculator.setExpression({ id: "583", latex: latex });
-			await sleep(100);
-		}
+		calculator.setExpression({ id: "583", latex: 'd_{ata}=\\left[' + data + '\\right]' });
 	}
 
 	async function loadFromStorage() {
