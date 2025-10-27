@@ -179,6 +179,7 @@ async function main() {
 	loadingElement.innerHTML = "Loading Data..."
 
 	loadFromStorage();
+	await sleep(100);
 	loadFromExpression();
 	window.addEventListener('beforeunload', () => {
 		saveToExpression();
