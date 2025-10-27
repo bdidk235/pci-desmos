@@ -18,9 +18,9 @@ async function main() {
 			onGalaxy = true;
 			if (e.data.type === "save_content" && sendGalaxyData) {
 				if (e.data.error === false) {
-					sendGalaxyData({ data: e.data.content });
+					sendGalaxyData({ content: e.data.content });
 				} else {
-					sendGalaxyData({ data: null, message: e.data.message });
+					sendGalaxyData({ content: null, message: e.data.message });
 				}
 			} else if (e.data.type === "saved") {
 				if (e.data.error === true)
