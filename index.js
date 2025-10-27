@@ -41,6 +41,7 @@ async function main() {
 
 	// Handle Data
 	function validateData(data) {
+		if (!data) return false;
 		const values = data.split(",");
 		for (i in values) {
 			const number = new Number(values[i]).valueOf()
