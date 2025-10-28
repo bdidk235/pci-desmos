@@ -13,7 +13,6 @@ async function main() {
 	let onGalaxy = document.referrer.startsWith("https://galaxy.click");
 	let sendGalaxyData = null;
 	window.addEventListener("message", e => {
-		console.log(e);
 		if (e.origin === "https://galaxy.click") {
 			onGalaxy = true;
 			if (e.data.type === "save_content" && sendGalaxyData) {
